@@ -7,13 +7,9 @@ import java.util.stream.Stream;
 
 public interface WeatherStore extends AutoCloseable {
 
-	public static void insertWeatherInfo(Weather weatherData){
-
-	}
-	public static Stream<Location> retrieveLocationData(){
+	default void insertWeatherInfo(Weather weatherData){}
+	default Stream<Location> retrieveLocationData(){
 		return Stream.empty();
 	}
-	default void close() {
-
-	}
+	default void close() {}
 }

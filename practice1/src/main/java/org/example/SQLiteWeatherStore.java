@@ -5,6 +5,8 @@ import org.example.model.Weather;
 
 import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -40,30 +42,29 @@ public class SQLiteWeatherStore implements WeatherStore{
 					weatherData.getMain() + "', '" +
 					weatherData.getDescription() + "', '" +
 					weatherData.getTimestamp() + "', " +
-					weatherData.getLocationIdentifier() + ");";
+					weatherData.getLocation().getId() + ");";
 			return executeSQLSentence(statement, insertSQL);
 		}
 		catch (Exception e){
-			System.out.println("Problem inserting the weather data of : " + weatherData.getLocationIdentifier());
+			System.out.println("Problem inserting the weather data of : " + weatherData.getLocation());
 			return false;
 		}
 	}
-	public Stream<Location> retrieveLocationData(Statement statement) throws SQLException {
+	public List<Location> retrieveLocationData(Statement statement) throws SQLException {
 		ResultSet rs = statement.executeQuery("SELECT * FROM Location");
-		return Stream.generate(() -> {
-			try {
-				if (rs.next()) {
-					int id = rs.getInt("Id");
-					String name = rs.getString("name");
-					double latitude = rs.getDouble("latitude");
-					double longitude = rs.getDouble("longitude");
-					return new Location(id, name, latitude, longitude);
-				}
-			} catch (SQLException e) {
-				System.out.println("Problem returning the Locations data");
+		List<Location> locationList = new ArrayList<>();
+		try {
+			while (rs.next()) {
+				int id = rs.getInt("Id");
+				String name = rs.getString("name");
+				double latitude = rs.getDouble("latitude");
+				double longitude = rs.getDouble("longitude");
+				locationList.add(new Location(id, name, latitude, longitude));
 			}
-			return null;
-		}).takeWhile(Objects::nonNull);
+		} catch (SQLException e) {
+			System.out.println("Problem returning the Locations data");
+		}
+		return locationList;
 	}
 	public static void populatedLocationTable(Statement statement) {
 		String line;
@@ -75,11 +76,9 @@ public class SQLiteWeatherStore implements WeatherStore{
 					String name = data[0];
 					double latitude = Double.parseDouble(data[1]);
 					double longitude = Double.parseDouble(data[2]);
-
 					// Generate SQL insert statement
 					String insertSQL = "INSERT INTO Location (name, latitude, longitude) " +
 							"VALUES ('" + name + "', " + latitude + ", " + longitude + ");";
-
 					executeSQLSentence(statement, insertSQL);
 				} else {
 					System.out.println("Skipping invalid data: " + line);
@@ -103,7 +102,7 @@ public class SQLiteWeatherStore implements WeatherStore{
 				"temperatureKf REAL,\n" +
 				"main TEXT,\n" +
 				"description TEXT,\n" +
-				"timestamp TEXT,\n" +
+				"timestamp TIMESTAMP,\n" +
 				"locationIdentifier INTEGER\n" +
 				")");
 	}

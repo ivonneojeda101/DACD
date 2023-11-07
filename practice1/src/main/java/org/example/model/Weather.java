@@ -1,7 +1,5 @@
 package org.example.model;
 
-import java.util.Date;
-
 public class Weather {
 	private double temperature;
 	private double feelsLike;
@@ -14,11 +12,11 @@ public class Weather {
 	private double temperatureKf;
 	private String main;
 	private String description;
-	private Date timestamp;
-	private int locationIdentifier;
+	private String timestamp;
+	private Location location;
 
 	// Constructor
-	public Weather(double temperature, double feelsLike, double minTemperature, double maxTemperature, int pressure, int seaLevel, int groundLevel, int humidity, double temperatureKf, String main, String description, Date timestamp, int locationIdentifier) {
+	public Weather(double temperature, double feelsLike, double minTemperature, double maxTemperature, int pressure, int seaLevel, int groundLevel, int humidity, double temperatureKf, String main, String description, String timestamp, Location location) {
 		this.temperature = temperature;
 		this.feelsLike = feelsLike;
 		this.minTemperature = minTemperature;
@@ -31,7 +29,7 @@ public class Weather {
 		this.main = main;
 		this.description = description;
 		this.timestamp = timestamp;
-		this.locationIdentifier = locationIdentifier;
+		this.location = location;
 	}
 
 	// Getters and Setters
@@ -123,19 +121,19 @@ public class Weather {
 		this.description = description;
 	}
 
-	public Date getTimestamp() {
+	public String getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
 
-	public int getLocationIdentifier() {
-		return locationIdentifier;
+	public Location getLocation() {
+		return location;
 	}
 
-	public void setLocationIdentifier(int locationIdentifier) {
-		this.locationIdentifier = locationIdentifier;
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 }

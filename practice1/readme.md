@@ -76,4 +76,4 @@ The SOLID principles are a set of object-oriented design principles that aim to 
 
 ### UML Class Diagram
 
-![Description of the Image](./src/files/UML_Ejercicio_1.jpg)
+![UML Class Diagram](./src/files/UML_Ejercicio_1.jpg)

@@ -1,42 +1,49 @@
 package org.example.controllers;
 
-import org.example.interfaces.WeatherProvider;
-import org.example.interfaces.WeatherStore;
 import org.example.model.Location;
 import org.example.model.Weather;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.Statement;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class WeatherController {
 	private final WeatherStore weatherStore;
 	private final WeatherProvider weatherProvider;
 	private final String csvFilePath;
-
-	public WeatherController(WeatherStore weatherStore, WeatherProvider weatherProvider, String csvFilePath) {
+	private Set<Instant> dateTimes;
+	private final List<Location> locations;
+	private final String hourFrequency;
+	public WeatherController(WeatherStore weatherStore, WeatherProvider weatherProvider, String csvFilePath, String hourFrequency) {
 		this.weatherStore = weatherStore;
 		this.weatherProvider = weatherProvider;
 		this.csvFilePath = csvFilePath;
+		this.hourFrequency = hourFrequency;
+		locations = getLocations();
+		weatherStore.setUpStore(locations);
 	}
 	public void fetchWeather(){
 		try {
-			Set<Instant> dateTimes = generateDateTimes();
-			List<Location> locations = getLocations();
-			weatherStore.setUpStore(locations);
-			for (Location location : locations) {
-				List<Weather> weatherList = weatherProvider.getWeather(location, dateTimes);
-				for (Weather weather : weatherList) {
-					weatherStore.setWeather(weather);
+			Timer timer = new Timer();
+			BigDecimal frequency = new BigDecimal(hourFrequency);
+			BigDecimal millisecondsFrequency = frequency.multiply(BigDecimal.valueOf(60 * 60 * 1000));
+			long milliseconds = millisecondsFrequency.longValue();
+			timer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					dateTimes = generateDateTimes();
+					for (Location location : locations) {
+						List<Weather> weatherList = weatherProvider.getWeather(location, dateTimes);
+						for (Weather weather : weatherList) {
+							weatherStore.setWeather(weather);
+						}
+					}
 				}
-			}
+			}, 0, milliseconds);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -54,11 +61,11 @@ public class WeatherController {
 					double longitude = Double.parseDouble(data[2]);
 					locationList.add(new Location(name, latitude, longitude));
 				} else {
-					System.out.println("Skipping invalid data: " + line);
+					throw new RuntimeException("Skipping invalid data: " + line);
 				}
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			throw new RuntimeException(e);
 		}
 		return locationList;
 	}

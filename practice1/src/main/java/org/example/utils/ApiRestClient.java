@@ -14,7 +14,6 @@ public class ApiRestClient {
 			connection.setRequestMethod(requestMethod);
 			int responseCode = connection.getResponseCode();
 			if (responseCode == 200) {
-				// Read the response from the API
 				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String line;
 				while ((line = reader.readLine()) != null) {

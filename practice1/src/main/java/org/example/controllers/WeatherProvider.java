@@ -1,4 +1,4 @@
-package org.example.interfaces;
+package org.example.controllers;
 
 import org.example.model.Location;
 import org.example.model.Weather;

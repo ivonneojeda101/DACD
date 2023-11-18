@@ -1,12 +1,11 @@
-package org.example;
+package org.example.controllers;
 
-import org.example.interfaces.WeatherStore;
 import org.example.model.Location;
 import org.example.model.Weather;
 
 import java.sql.*;
-import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class SQLiteWeatherStore implements WeatherStore {
@@ -33,32 +32,32 @@ public class SQLiteWeatherStore implements WeatherStore {
 	public void setWeather(Weather weather){
 		try {
 			String tableName = weather.getLocation().getName().replace(" ", "");
-			String lastUpdate = Instant.now().toString();
-			String insertSQL = "INSERT INTO " + tableName + " (temperature, humidity, clouds, windSpeed, precipitationProbability, timestamp, lastUpdate) " +
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			String lastUpdate = formatter.format(ZonedDateTime.now());
+			String insertSQL = "INSERT OR REPLACE INTO " + tableName + " (temperature, humidity, clouds, windSpeed, precipitationProbability, timestamp, lastUpdate) " +
 					"VALUES (" +
 					weather.getTemperature() + ", " +
 					weather.getHumidity() + ", " +
 					weather.getClouds() + ", " +
 					weather.getWindSpeed() + ", " +
-					weather.getPrecipitationProbability() + ", " +
-					weather.getTimestamp() + ", " +
-					lastUpdate + ");";
+					weather.getPrecipitationProbability() + ", '" +
+					weather.getTimestamp() + "', '" +
+					lastUpdate + "');";
 			statement.execute(insertSQL);
 		}
 		catch (Exception e){
-			System.out.println("Problem inserting the weather data of : " + weather.getLocation().getName());
+			throw new RuntimeException("Problem inserting the weather data of : " + weather.getLocation().getName());
 		}
 	}
 
 	private static void createWeatherTable(String tableName) throws SQLException {
 		statement.execute("CREATE TABLE IF NOT EXISTS " + tableName + " ("
-				+ "id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "temperature REAL,"
 				+ "humidity INTEGER,"
 				+ "clouds INTEGER,"
 				+ "windSpeed REAL,"
 				+ "precipitationProbability INTEGER,"
-				+ "timestamp DATETIME,"
+				+ "timestamp DATETIME PRIMARY KEY,"
 				+ "lastUpdate DATETIME"
 				+ ")");
 	}
@@ -73,7 +72,7 @@ public class SQLiteWeatherStore implements WeatherStore {
 			System.out.println("Connection to SQLite has been established.");
 	}
 	@Override
-	public void close() {
+	public void close() throws SQLException {
+		connection.close();
 	}
-
 }

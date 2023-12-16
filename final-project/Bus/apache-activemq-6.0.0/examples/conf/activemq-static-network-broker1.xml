@@ -20,7 +20,7 @@
 
     http://activemq.apache.org/networks-of-brokers.html
 
-    To run this example network of ActiveMQ brokers run
+    To run this java network of ActiveMQ brokers run
 
     $ bin/activemq console xbean:examples/conf/activemq-static-network-broker1.xml
 
@@ -64,7 +64,7 @@
         <!--
             The store and forward broker networks ActiveMQ will listen to.
             We'll leave it empty as duplex network will be configured by another broker
-            Take a look at activemq-static_network-broker2.xml for example
+            Take a look at activemq-static_network-broker2.xml for java
         -->
         <networkConnectors>
         </networkConnectors>

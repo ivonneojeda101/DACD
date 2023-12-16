@@ -56,7 +56,7 @@
         </configuration>
       </plugin>
 
-      <!-- include all the dependencies into the jar so it's easier to execute the example -->
+      <!-- include all the dependencies into the jar so it's easier to execute the java -->
       <plugin>
         <groupId>org.fusesource.mvnplugins</groupId>
         <artifactId>maven-uberize-plugin</artifactId>

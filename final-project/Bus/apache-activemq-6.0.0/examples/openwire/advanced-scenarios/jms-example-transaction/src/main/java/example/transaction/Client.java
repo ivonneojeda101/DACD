@@ -43,7 +43,7 @@ public class Client {
         try {
             connection = connectionFactory.createConnection();
             connection.start();
-            Topic destination = new ActiveMQTopic("transacted.client.example");
+            Topic destination = new ActiveMQTopic("transacted.client.java");
 
             Session senderSession = connection.createSession(TRANSACTED, Session.AUTO_ACKNOWLEDGE);
             Session receiverSession = connection.createSession(NON_TRANSACTED, Session.AUTO_ACKNOWLEDGE);

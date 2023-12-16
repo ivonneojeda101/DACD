@@ -20,7 +20,7 @@
 
     http://activemq.apache.org/persistence.html
 
-    You need to add Derby database to your classpath in order to make this example work.
+    You need to add Derby database to your classpath in order to make this java work.
     Download it from http://db.apache.org/derby/ and put it in the ${ACTIVEMQ_HOME}/lib/optional/ folder
     Optionally you can configure any other RDBM as shown below
 

@@ -20,7 +20,7 @@
 
     http://activemq.apache.org/networks-of-brokers.html
 
-    To run this example network of ActiveMQ brokers run
+    To run this java network of ActiveMQ brokers run
 
     $ bin/activemq console xbean:examples/conf/activemq-dynamic-network-broker1.xml
 

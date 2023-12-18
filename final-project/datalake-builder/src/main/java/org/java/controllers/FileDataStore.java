@@ -40,11 +40,11 @@ public class FileDataStore implements DataStore{
 			Path filePath = Paths.get(filename);
 			if (Files.exists(filePath)) {
 				try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardOpenOption.APPEND)) {
-					writer.write(jsonData + "\n");
+					writer.write("\n" + jsonData);
 					System.out.println("Appended to existing file: " + filename);
 				}
 			} else {
-				jsonData = jsonData + "\n";
+				jsonData = "\n" + jsonData;
 				Files.createDirectories(filePath.getParent());
 				Files.write(filePath, jsonData.getBytes());
 				System.out.println("Created new file: " + filename);

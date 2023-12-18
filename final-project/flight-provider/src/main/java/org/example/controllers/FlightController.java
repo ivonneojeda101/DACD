@@ -1,9 +1,7 @@
-package org.java.controllers;
+package org.example.controllers;
 
-import org.java.exceptions.WeatherException;
-import org.java.model.Location;
-import org.java.model.Weather;
-
+import org.example.exceptions.CustomException;
+import org.example.model.IslandFlightTracker;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.math.BigDecimal;
@@ -12,21 +10,21 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 
-public class WeatherController {
-	private final WeatherStore weatherStore;
-	private final WeatherProvider weatherProvider;
+public class FlightController {
+	private final FlightStore flightStore;
+	private final FlightProvider flightProvider;
 	private final String csvFilePath;
 	private Set<Instant> dateTimes;
-	private final List<Location> locations;
+	private final List<String> islandAirports;
 	private final String hourFrequency;
-	public WeatherController(WeatherStore weatherStore, WeatherProvider weatherProvider, String csvFilePath, String hourFrequency) throws WeatherException {
-		this.weatherStore = weatherStore;
-		this.weatherProvider = weatherProvider;
+	public FlightController(FlightStore flightStore, FlightProvider flightProvider, String csvFilePath, String hourFrequency) throws CustomException {
+		this.flightStore = flightStore;
+		this.flightProvider = flightProvider;
 		this.csvFilePath = csvFilePath;
 		this.hourFrequency = hourFrequency;
-		locations = getLocations();
+		islandAirports = getIslandAirports();
 	}
-	public void fetchWeather() throws WeatherException {
+	public void fetchFlight() throws CustomException {
 		try {
 			Timer timer = new Timer();
 			BigDecimal frequency = new BigDecimal(hourFrequency);
@@ -36,42 +34,41 @@ public class WeatherController {
 				@Override
 				public void run() {
 					dateTimes = generateDateTimes();
-					for (Location location : locations) {
-						List<Weather> weatherList = weatherProvider.getWeather(location, dateTimes);
-						for (Weather weather : weatherList) {
-							try {
-								weatherStore.setWeather(weather);
-							} catch (WeatherException e) {
-								throw new RuntimeException(e);
+					for (String airport : islandAirports) {
+						try {
+							List<IslandFlightTracker> flightTrackers = flightProvider.getFlight(islandAirports.get(0), airport, dateTimes);
+							for (IslandFlightTracker flightOffer : flightTrackers) {
+								flightStore.setFlight(flightOffer);
 							}
+						} catch (CustomException e) {
+							throw new RuntimeException(e);
 						}
+
 					}
 				}
 			}, 0, milliseconds);
 		} catch (Exception e) {
-			throw new WeatherException(e.getMessage());
+			throw new CustomException(e.getMessage());
 		}
 	}
-	private List<Location> getLocations() throws WeatherException {
-		List<Location> locationList = new ArrayList<>();
+	private List<String> getIslandAirports() throws CustomException {
+		List<String> airportList = new ArrayList<>();
 		String line;
 		String csvDelimiter = ";";
+		System.out.println(System.getProperty("user.dir"));
 		try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(csvDelimiter);
 				if (data.length == 4) {
-					String name = data[0];
-					double latitude = Double.parseDouble(data[1]);
-					double longitude = Double.parseDouble(data[2]);
-					locationList.add(new Location(name, latitude, longitude));
+					airportList.add(data[3]);
 				} else {
-					throw new WeatherException("Skipping invalid data: " + line);
+					throw new CustomException("Skipping invalid data: " + line);
 				}
 			}
 		} catch (Exception e) {
-			throw new WeatherException(e.getMessage());
+			throw new CustomException(e.getMessage());
 		}
-		return locationList;
+		return airportList;
 	}
 
 	private Set<Instant> generateDateTimes() {

@@ -10,6 +10,7 @@
     <modules>
         <module>datalake-builder</module>
         <module>weather-provider</module>
+        <module>flight-provider</module>
     </modules>
 
     <properties>

@@ -17,6 +17,7 @@ public class FlightController {
 	private Set<Instant> dateTimes;
 	private final List<String> islandAirports;
 	private final String hourFrequency;
+	private List<String> islandName;
 	public FlightController(FlightStore flightStore, FlightProvider flightProvider, String csvFilePath, String hourFrequency) throws CustomException {
 		this.flightStore = flightStore;
 		this.flightProvider = flightProvider;
@@ -34,9 +35,9 @@ public class FlightController {
 				@Override
 				public void run() {
 					dateTimes = generateDateTimes();
-					for (String airport : islandAirports) {
+					for (int i = 0; i < islandAirports.size(); i++) {
 						try {
-							List<IslandFlightTracker> flightTrackers = flightProvider.getFlight(islandAirports.get(0), airport, dateTimes);
+							List<IslandFlightTracker> flightTrackers = flightProvider.getFlight(islandAirports.get(0), islandAirports.get(i), islandName.get(i), dateTimes);
 							for (IslandFlightTracker flightOffer : flightTrackers) {
 								flightStore.setFlight(flightOffer);
 							}
@@ -53,6 +54,7 @@ public class FlightController {
 	}
 	private List<String> getIslandAirports() throws CustomException {
 		List<String> airportList = new ArrayList<>();
+		islandName =  new ArrayList<>();
 		String line;
 		String csvDelimiter = ";";
 		System.out.println(System.getProperty("user.dir"));
@@ -60,6 +62,7 @@ public class FlightController {
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(csvDelimiter);
 				if (data.length == 4) {
+					islandName.add(data[0]);
 					airportList.add(data[3]);
 				} else {
 					throw new CustomException("Skipping invalid data: " + line);

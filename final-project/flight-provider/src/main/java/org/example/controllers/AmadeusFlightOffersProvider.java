@@ -29,7 +29,7 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 		this.clientSecret = clientSecret;
 	}
 	@Override
-	public List<IslandFlightTracker> getFlight(String departureAirport, String arrivalAirport, Set<Instant> dateTimes) throws CustomException {
+	public List<IslandFlightTracker> getFlight(String departureAirport, String arrivalAirport, String islandName, Set<Instant> dateTimes) throws CustomException {
 		List<IslandFlightTracker> dailyFlights = new ArrayList<>();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		getToken();
@@ -38,11 +38,10 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 			String formattedDate = date.format(formatter);
 			String url = apiURL + "?originLocationCode=" + departureAirport + "&destinationLocationCode=" + arrivalAirport + "&departureDate=" + formattedDate + "&adults=1&max=3&nonStop=true";
 			List<Flight> flights = consumeService(url);
-			System.out.println("Date and Time: " + dateTime);
 			if (!flights.isEmpty()){
 				LocalDate localDate = LocalDate.parse(formattedDate);
 				Instant instantDate = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-				dailyFlights.add(new IslandFlightTracker(arrivalAirport, flights, instantDate, "flight-provider"));
+				dailyFlights.add(new IslandFlightTracker(islandName, flights, instantDate, "flight-provider"));
 			}
 		}
 		return dailyFlights;
@@ -54,12 +53,17 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 		List<Flight> flights = new ArrayList<>();
 		if (response != null && !response.isEmpty()) {
 			JsonObject jsonObject = JsonParser.parseString(String.valueOf(response)).getAsJsonObject();
-			JsonArray listFlightOffers = jsonObject.get("data").getAsJsonArray();
-			JsonObject carriers = jsonObject.get("dictionaries").getAsJsonObject().get("carriers").getAsJsonObject();
-			for (JsonElement element : listFlightOffers) {
-				JsonObject flightOffer = element.getAsJsonObject();
-				Flight flight = createFlight(flightOffer, carriers);
-				flights.add(flight);
+			JsonArray listFlightOffers = jsonObject.has("data") ? jsonObject.get("data").getAsJsonArray() : new JsonArray();
+			if (!listFlightOffers.isEmpty()) {
+				JsonObject carriers = jsonObject.get("dictionaries").getAsJsonObject().get("carriers").getAsJsonObject();
+				for (JsonElement element : listFlightOffers) {
+					JsonObject flightOffer = element.getAsJsonObject();
+					Flight flight = createFlight(flightOffer, carriers);
+					flights.add(flight);
+				}
+			}
+			else {
+				System.out.println("Flights provider not available");
 			}
 		}
 		else {

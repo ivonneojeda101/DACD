@@ -1,7 +1,7 @@
-package org.java.controllers;
+package org.example.controllers;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.java.exceptions.DatalakeBuilderException;
+import org.example.exceptions.BussinessUnitException;
 
 import javax.jms.*;
 import java.util.List;
@@ -17,13 +17,14 @@ public class AMQDataProvider implements DataProvider{
 	}
 
 	@Override
-	public void getData(DataStore dataStore) throws DatalakeBuilderException {
+	public void getData(DataStore dataStore) throws BussinessUnitException {
 		try {
 			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
 			Connection connection = connectionFactory.createConnection();
-			connection.setClientID("Data-lakeBuilder");
+			connection.setClientID("DatalakeBuilder");
 			connection.start();
 			topics.parallelStream().forEach(topic -> {
+			//for (String topic : topics) {
 				try {
 					Session session = connection.createSession(false,
 							Session.AUTO_ACKNOWLEDGE);
@@ -31,7 +32,7 @@ public class AMQDataProvider implements DataProvider{
 					MessageConsumer consumer = session.createDurableSubscriber(destination, topic);
 					consumer.setMessageListener(message -> {
 						try {
-							dataStore.storeData(((TextMessage)message).getText());
+							dataStore.storeData(((TextMessage) message).getText());
 							System.out.println();
 						} catch (Exception e) {
 							throw new RuntimeException(e);
@@ -43,7 +44,7 @@ public class AMQDataProvider implements DataProvider{
 			});
 		}
 		catch (Exception e) {
-			throw new DatalakeBuilderException(e.getMessage());
+			throw new BussinessUnitException(e.getMessage());
 		}
 	}
 }

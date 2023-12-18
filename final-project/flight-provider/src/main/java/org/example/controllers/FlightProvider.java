@@ -10,5 +10,5 @@ import java.util.Set;
 
 public interface FlightProvider {
 
-	public List<IslandFlightTracker> getFlight(String departureAirport, String arrivalAirport, Set<Instant> dateTimes) throws CustomException;
+	public List<IslandFlightTracker> getFlight(String departureAirport, String arrivalAirport, String islandName, Set<Instant> dateTimes) throws CustomException;
 }

@@ -7,7 +7,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.example.exceptions.CustomException;
-import org.example.model.IslandFlightTracker;
+import org.example.model.Flight;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -29,7 +29,7 @@ public class AMQFlightStore implements FlightStore {
 		this.subject = subject;
 	}
 	@Override
-	public void setFlight(IslandFlightTracker flight) throws CustomException {
+	public void setFlight(Flight flight) throws CustomException {
 		try {
 			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
 			Connection connection = connectionFactory.createConnection();

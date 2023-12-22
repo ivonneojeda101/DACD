@@ -9,7 +9,7 @@ public class Main {
 		FlightStore flightStore = new AMQFlightStore(args[4], args[5]);
 		FlightController flightcontroller = new FlightController(flightStore, flightProvider, args[6], args[7]);
 		try{
-			flightcontroller.fetchFlight();
+			flightcontroller.fetchFlight(args[8]);
 		}
 		catch (Exception e) {
 			System.out.println(e);

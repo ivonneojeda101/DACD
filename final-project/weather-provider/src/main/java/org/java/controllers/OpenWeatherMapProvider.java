@@ -52,7 +52,7 @@ public class OpenWeatherMapProvider implements WeatherProvider {
 		double windSpeed = hourForecast.getAsJsonObject("wind").get("speed").getAsDouble();
 		int precipitationProbability = hourForecast.get("pop").getAsInt();
 		LocalDateTime localDateTime = LocalDateTime.parse(hourForecast.get("dt_txt").getAsString(), formatter);
-		Instant predictionTimestamp = localDateTime.atZone(ZoneId.systemDefault()).toInstant();;
-		return new Weather(temperature,humidity,clouds,windSpeed,precipitationProbability, location, predictionTimestamp, "prediction-provider");
+		Instant predictionTime = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+		return new Weather(temperature,humidity,clouds,windSpeed,precipitationProbability, location, predictionTime, "prediction-provider");
 	}
 }

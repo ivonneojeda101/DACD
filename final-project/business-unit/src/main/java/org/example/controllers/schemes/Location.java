@@ -1,4 +1,6 @@
-package org.example.model;
+package org.example.controllers.schemes;
+
+import java.time.Instant;
 
 public class Location {
 	private final String name;
@@ -14,11 +16,4 @@ public class Location {
 		return name;
 	}
 
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
 }

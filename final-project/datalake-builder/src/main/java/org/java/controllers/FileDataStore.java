@@ -25,14 +25,12 @@ public class FileDataStore implements DataStore{
 	}
 
 	@Override
-	public void storeData(String jsonData) throws DatalakeBuilderException {
+	public void storeData(String jsonData, String source) throws DatalakeBuilderException {
 		try {
 			JsonObject jsonEvent = JsonParser.parseString(String.valueOf(jsonData)).getAsJsonObject();
-			String timestamp = jsonEvent.get("timestamp").toString();
+			String timestamp = jsonEvent.get("ts").toString();
 			timestamp = timestamp.replaceAll("^\"|\"$", "");
 			System.out.println(timestamp);
-			String source = jsonEvent.get("sourceStamp").toString();
-			source = source.replaceAll("^\"|\"$", "");
 			Instant instant = Instant.parse(timestamp);
 			String yyyymmdd = instant.atZone(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.BASIC_ISO_DATE);
 			String filename = directory + source + "/" + yyyymmdd + ".events";

@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.controllers.schemes;
 
 import java.time.Instant;
 
@@ -8,23 +8,29 @@ public class Weather {
 	private final int clouds;
 	private final double windSpeed;
 	private final int precipitationProbability;
-	private final Instant timestamp;
 	private final Location location;
-	private final Instant predictionTimestamp;
-	private final String sourceStamp;
-	// Constructor
-	public Weather(double temperature, int humidity, int clouds, double windSpeed, int precipitationProbability, Instant timestamp, Location location, Instant predictionTimestamp, String sourceStamp) {
+	private final Instant predictionTime;
+
+	public Weather(double temperature, int humidity, int clouds, double windSpeed, int precipitationProbability, Location location, Instant predictionTime) {
 		this.temperature = temperature;
 		this.humidity = humidity;
 		this.clouds = clouds;
 		this.windSpeed = windSpeed;
 		this.precipitationProbability = precipitationProbability;
-		this.timestamp = timestamp;
 		this.location = location;
-		this.predictionTimestamp = predictionTimestamp;
-		this.sourceStamp = sourceStamp;
+		this.predictionTime = predictionTime;
 	}
-	// Getter methods
+
+	public Weather() {
+		this.temperature = 0.0;
+		this.humidity = 0;
+		this.clouds = 0;
+		this.windSpeed = 0.0;
+		this.precipitationProbability = 0;
+		this.location = null;
+		this.predictionTime = Instant.now();
+	}
+
 	public double getTemperature() {
 		return temperature;
 	}
@@ -45,15 +51,11 @@ public class Weather {
 		return precipitationProbability;
 	}
 
-	public Instant getTimestamp() {
-		return timestamp;
-	}
-
 	public Location getLocation() {
 		return location;
 	}
 
-	public Instant getPredictionTimestamp() { return predictionTimestamp; }
-
-	public String getSourceStamp() { return sourceStamp; }
+	public Instant getPredictionTime() {
+		return predictionTime;
+	}
 }

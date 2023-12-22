@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.controllers.schemes;
 
 import java.time.Instant;
 
@@ -14,10 +14,9 @@ public class Flight {
 	private final Double price;
 	private final String currency;
 	private final Instant predictionTime;
-	private final Instant ts = Instant.now();
-	private final String ss;
+	private final String key;
 
-	public Flight(String destination, String departureAirport, Instant departureDatetime, String arrivalAirport, Instant arrivalDatetime, String carrierName, String duration, Double price, String currency, Instant predictionTime, String ss) {
+	public Flight(String destination, String departureAirport, Instant departureDatetime, String arrivalAirport, Instant arrivalDatetime, String carrierName, String duration, Double price, String currency, Instant predictionTime) {
 		this.destination = destination;
 		this.departureAirport = departureAirport;
 		this.departureDatetime = departureDatetime;
@@ -28,6 +27,10 @@ public class Flight {
 		this.price = price;
 		this.currency = currency;
 		this.predictionTime = predictionTime;
-		this.ss = ss;
+		this.key = (departureAirport + departureDatetime.toString() + arrivalAirport + arrivalDatetime.toString() + carrierName).replaceAll(" ","");
+	}
+
+	public String getKey() {
+		return key;
 	}
 }

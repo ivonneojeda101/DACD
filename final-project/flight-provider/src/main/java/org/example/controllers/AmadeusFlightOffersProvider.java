@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.example.exceptions.CustomException;
 import org.example.model.Flight;
-import org.example.model.IslandFlightTracker;
 import org.example.utils.ApiRestClient;
 import java.time.*;
 import java.time.format.*;
@@ -29,25 +28,25 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 		this.clientSecret = clientSecret;
 	}
 	@Override
-	public List<IslandFlightTracker> getFlight(String departureAirport, String arrivalAirport, String islandName, Set<Instant> dateTimes) throws CustomException {
-		List<IslandFlightTracker> dailyFlights = new ArrayList<>();
+	public List<Flight> getFlight(String departureAirport, String arrivalAirport, String destination, Set<Instant> dateTimes) throws CustomException {
+		List<Flight> dailyFlights = new ArrayList<>();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		getToken();
 		for (Instant dateTime : dateTimes) {
 			LocalDate date = dateTime.atZone(ZoneOffset.UTC).toLocalDate();
 			String formattedDate = date.format(formatter);
 			String url = apiURL + "?originLocationCode=" + departureAirport + "&destinationLocationCode=" + arrivalAirport + "&departureDate=" + formattedDate + "&adults=1&max=3&nonStop=true";
-			List<Flight> flights = consumeService(url);
+			LocalDate localDate = LocalDate.parse(formattedDate);
+			Instant predictionTime = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+			List<Flight> flights = consumeService(url, destination, predictionTime);
 			if (!flights.isEmpty()){
-				LocalDate localDate = LocalDate.parse(formattedDate);
-				Instant instantDate = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-				dailyFlights.add(new IslandFlightTracker(islandName, flights, instantDate, "flight-provider"));
+				dailyFlights.addAll(flights);
 			}
 		}
 		return dailyFlights;
 	}
 
-	private List<Flight> consumeService(String apiURL) throws CustomException {
+	private List<Flight> consumeService(String apiURL, String destination, Instant predictionTime) throws CustomException {
 		ApiRestClient apiRestClient = new ApiRestClient();
 		StringBuilder response = apiRestClient.consumeService(apiURL,"GET", apiToken, "", "");
 		List<Flight> flights = new ArrayList<>();
@@ -58,7 +57,7 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 				JsonObject carriers = jsonObject.get("dictionaries").getAsJsonObject().get("carriers").getAsJsonObject();
 				for (JsonElement element : listFlightOffers) {
 					JsonObject flightOffer = element.getAsJsonObject();
-					Flight flight = createFlight(flightOffer, carriers);
+					Flight flight = createFlight(flightOffer, carriers, destination, predictionTime);
 					flights.add(flight);
 				}
 			}
@@ -72,7 +71,7 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 		return flights;
 	}
 
-	private Flight createFlight(JsonObject flightOffer, JsonObject carriers) {
+	private Flight createFlight(JsonObject flightOffer, JsonObject carriers, String destination, Instant predictionTime) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 		JsonObject firstSegment = flightOffer
 				.getAsJsonArray("itineraries")
@@ -94,7 +93,7 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 		String duration = firstSegment.get("duration").getAsString().substring(2);
 		Double price = flightOffer.getAsJsonObject("price").get("grandTotal").getAsDouble();
 		String currency = flightOffer.getAsJsonObject("price").get("currency").getAsString();
-		return new Flight(departureAirport, departureDatetime, arrivalAirport, arrivalDatetime, carrierName, duration, price, currency);
+		return new Flight(destination, departureAirport, departureDatetime, arrivalAirport, arrivalDatetime, carrierName, duration, price, currency, predictionTime, "flight-provider");
 	}
 
 	private void getToken() throws CustomException {

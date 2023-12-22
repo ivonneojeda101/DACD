@@ -1,7 +1,7 @@
 package org.example.controllers;
 
 import org.example.exceptions.CustomException;
-import org.example.model.IslandFlightTracker;
+import org.example.model.Flight;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.math.BigDecimal;
@@ -15,17 +15,16 @@ public class FlightController {
 	private final FlightProvider flightProvider;
 	private final String csvFilePath;
 	private Set<Instant> dateTimes;
-	private final List<String> islandAirports;
 	private final String hourFrequency;
-	private List<String> islandName;
+	private Map<String, String> destinations;
 	public FlightController(FlightStore flightStore, FlightProvider flightProvider, String csvFilePath, String hourFrequency) throws CustomException {
 		this.flightStore = flightStore;
 		this.flightProvider = flightProvider;
 		this.csvFilePath = csvFilePath;
 		this.hourFrequency = hourFrequency;
-		islandAirports = getIslandAirports();
+		getDestinationAirports();
 	}
-	public void fetchFlight() throws CustomException {
+	public void fetchFlight(String departureAirport) throws CustomException {
 		try {
 			Timer timer = new Timer();
 			BigDecimal frequency = new BigDecimal(hourFrequency);
@@ -35,10 +34,11 @@ public class FlightController {
 				@Override
 				public void run() {
 					dateTimes = generateDateTimes();
-					for (int i = 0; i < islandAirports.size(); i++) {
+					for (String key : destinations.keySet()) {
 						try {
-							List<IslandFlightTracker> flightTrackers = flightProvider.getFlight(islandAirports.get(0), islandAirports.get(i), islandName.get(i), dateTimes);
-							for (IslandFlightTracker flightOffer : flightTrackers) {
+							String arrivalAirport = destinations.get(key);
+							List<Flight> flightTrackers = flightProvider.getFlight(departureAirport, arrivalAirport, key , dateTimes);
+							for (Flight flightOffer : flightTrackers) {
 								flightStore.setFlight(flightOffer);
 							}
 						} catch (CustomException e) {
@@ -52,9 +52,8 @@ public class FlightController {
 			throw new CustomException(e.getMessage());
 		}
 	}
-	private List<String> getIslandAirports() throws CustomException {
-		List<String> airportList = new ArrayList<>();
-		islandName =  new ArrayList<>();
+	private void getDestinationAirports() throws CustomException {
+		destinations = new HashMap<>();
 		String line;
 		String csvDelimiter = ";";
 		System.out.println(System.getProperty("user.dir"));
@@ -62,8 +61,7 @@ public class FlightController {
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(csvDelimiter);
 				if (data.length == 4) {
-					islandName.add(data[0]);
-					airportList.add(data[3]);
+					destinations.put(data[0], data[3]);
 				} else {
 					throw new CustomException("Skipping invalid data: " + line);
 				}
@@ -71,7 +69,6 @@ public class FlightController {
 		} catch (Exception e) {
 			throw new CustomException(e.getMessage());
 		}
-		return airportList;
 	}
 
 	private Set<Instant> generateDateTimes() {

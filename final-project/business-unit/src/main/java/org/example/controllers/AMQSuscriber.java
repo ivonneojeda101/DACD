@@ -30,7 +30,6 @@ public class AMQSuscriber implements DataSource {
 				consumer.setMessageListener(message -> {
 					try {
 						dataManagement.storeData(((TextMessage) message).getText());
-						System.out.println();
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}

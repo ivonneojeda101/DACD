@@ -1,50 +1,105 @@
 package org.example.controllers;
 
-import java.util.Scanner;
+import org.example.controllers.schemes.Weather;
+import org.example.exceptions.BussinessUnitException;
+import org.example.model.DateFlightWeather;
+import org.java.exceptions.WeatherException;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class BusinessController {
-
-	public void userInterface(DataManagement dataManagement) {
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Welcome to your next trip advisor! \n Let us know what are your weather preferences and we will advice you which destination to visit next week");
-		String[] params = {"Temperature", "Humidity", "Clouds", "Wind Speed", "Precipitation Probability"};
-		double[] weights = new double[params.length];
-		for (int i = 0; i < params.length; i++) {
-			System.out.println("Please enter the value for " + params[i] + getMessage(i));
-			weights[i] = getValidWeight(scanner);
-		}
-
-		System.out.println("Wait for the report ... \n");
-
-		System.out.println("\nEntered weights:");
-		for (int i = 0; i < params.length; i++) {
-			System.out.println(params[i] + ": " + weights[i] + " (0 - Not important to 10 - Very Important)");
-		}
-
-		scanner.close();
-
+	private final DataSource dataSource;
+	private final DataManagement dataManagement;
+	private final String csvFilePath;
+	private final List<String> destinations;
+	public BusinessController(DataSource dataSource, DataManagement dataManagement,String csvFilePath) throws BussinessUnitException {
+		this.csvFilePath = csvFilePath;
+		this.destinations = getDestinations();
+		this.dataSource = dataSource;
+		this.dataManagement = dataManagement;
 	}
 
-	private String getMessage(int index) {
-		return switch (index) {
-			case 0 -> " (from 0-Freezing to 10-Very Hot :";
-			case 1 -> " (from 0-Dry to 10-Humid):";
-			case 2 -> " (from 0-Clear skies to 10-Overcast):";
-			case 3 -> " (from 0-Calm to 10-Windy):";
-			case 4 -> " (from 0-Rare to 10-Frequent):";
-			default -> "";
-		};
-	}
+	public List<DateFlightWeather> getRecommendation(double[] weights) {
+		List<String> dates = getNextWeekDates();
+		Map<String, DateFlightWeather> dataGrid = dataManagement.getDataGrid();
+		Double[] scores = calculateScores(dataGrid, dates, weights);
+		int indexMaxScore = 0;
 
-	private double getValidWeight(Scanner scanner) {
-		double weight;
-		do {
-			while (!scanner.hasNextDouble()) {
-				System.out.println("Invalid input. Please enter a valid number between 0 and 10:");
-				scanner.next();
+		for (int i = 1; i < scores.length; i++) {
+			if (scores[i] > scores[indexMaxScore]) {
+				indexMaxScore = i;
 			}
-			weight = scanner.nextDouble();
-		} while (weight < 0 || weight > 10);
-		return weight/100;
+		}
+		return getWeatherAndFlights(dataGrid, destinations.get(indexMaxScore), dates);
+	}
+
+	public void startSubscriber() throws BussinessUnitException {
+		dataSource.getData(dataManagement);
+	}
+
+	private Double[] calculateScores(Map<String, DateFlightWeather> dataGrid, List<String> dates, double[] weights){
+		Double[] scores = new Double[destinations.size()];
+		Arrays.fill(scores, 0.0);
+		for (int i = 0; i < destinations.size(); i++) {
+			for (String date : dates) {
+				String key = date + "-" + destinations.get(i);
+				if (dataGrid.containsKey(key)) {
+					Weather weather = dataGrid.get(key).getWeather();
+					Double score = (weather.getTemperature() * weights[0]) + (weather.getHumidity() * weights[1]) + (weather.getClouds() * weights[2]) + (weather.getWindSpeed() * weights[3]) + (weather.getPrecipitationProbability() * weights[4]);
+					double finalScore = scores[i] + score;
+					scores[i] = finalScore;
+				}
+			}
+		}
+		return scores;
+	}
+
+	private List<DateFlightWeather> getWeatherAndFlights(Map<String, DateFlightWeather> dataGrid, String destination, List<String> dates){
+		List<DateFlightWeather> information = new ArrayList<>();
+		for (String date : dates) {
+			String key = date + "-" + destination;
+			if (dataGrid.containsKey(key)) {
+				information.add(dataGrid.get(key));
+			}
+		}
+		return information;
+	}
+
+
+	private List<String> getDestinations() throws BussinessUnitException {
+		List<String> destinations = new ArrayList<>();
+		String line;
+		String csvDelimiter = ";";
+		try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+			while ((line = br.readLine()) != null) {
+				String[] data = line.split(csvDelimiter);
+				if (data.length == 4) {
+					destinations.add(data[0]);
+				} else {
+					throw new WeatherException("Skipping invalid data: " + line);
+				}
+			}
+		} catch (Exception e) {
+			throw new BussinessUnitException(e.getMessage());
+		}
+		return destinations;
+	}
+
+	private List<String> getNextWeekDates() {
+		List<String> timestamps = new ArrayList<>();
+		LocalDate currentDate = LocalDate.now();
+		for (int i = 0; i < 5; i++) {
+			LocalDate nextDate = currentDate.plusDays(i+1);
+			Instant timestamp = nextDate.atStartOfDay().plusHours(12).toInstant(ZoneOffset.UTC);
+			String yyyymmdd = timestamp.atZone(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.BASIC_ISO_DATE);
+			timestamps.add(yyyymmdd);
+		}
+		return timestamps;
 	}
 }

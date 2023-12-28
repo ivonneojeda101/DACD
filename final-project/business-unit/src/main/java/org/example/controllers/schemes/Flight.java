@@ -30,6 +30,45 @@ public class Flight {
 		this.key = (departureAirport + departureDatetime.toString() + arrivalAirport + arrivalDatetime.toString() + carrierName).replaceAll(" ","");
 	}
 
+	public String getDestination() {
+		return destination;
+	}
+
+	public String getDepartureAirport() {
+		return departureAirport;
+	}
+
+	public Instant getDepartureDatetime() {
+		return departureDatetime;
+	}
+
+	public String getArrivalAirport() {
+		return arrivalAirport;
+	}
+
+	public Instant getArrivalDatetime() {
+		return arrivalDatetime;
+	}
+
+	public String getCarrierName() {
+		return carrierName;
+	}
+
+	public String getDuration() {
+		return duration;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public Instant getPredictionTime() {
+		return predictionTime;
+	}
 	public String getKey() {
 		return key;
 	}

@@ -6,11 +6,11 @@ import org.example.exceptions.BussinessUnitException;
 import javax.jms.*;
 import java.util.List;
 
-public class AMQSuscriber implements DataSource {
+public class AMSubscriber implements DataSource {
 	private final String url;
 	private final List<String> topics;
 
-	public AMQSuscriber(String url, List<String> topics) {
+	public AMSubscriber(String url, List<String> topics) {
 		this.url = url;
 		this.topics = topics;
 	}
@@ -31,7 +31,7 @@ public class AMQSuscriber implements DataSource {
 					try {
 						dataManagement.storeData(((TextMessage) message).getText());
 					} catch (Exception e) {
-						throw new RuntimeException(e);
+						System.out.print(e.getMessage());
 					}
 				});
 			}

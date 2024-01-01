@@ -9,5 +9,6 @@ import java.util.Map;
 public interface DataManagement{
 
 	public void storeData(String data) throws BussinessUnitException;
+	public void deleteData(List<String> keyDates);
 	public Map<String, DateFlightWeather> getDataGrid();
 }

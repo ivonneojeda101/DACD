@@ -14,13 +14,13 @@ import java.util.Scanner;
 public class UserInterface {
 
 	public void start(BusinessController businessController) throws BussinessUnitException {
+		businessController.startSubscriber();
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("Welcome to your next trip advisor! \n Let us know what are your weather preferences and we will advice you which destination to visit next week");
+		System.out.println("Welcome to your next trip advisor! \nLet us know what are your weather preferences and we will advice you which destination to visit next week");
 		String[] params = {"Temperature", "Humidity", "Clouds", "Wind Speed", "Precipitation Probability"};
 		double[] weights = new double[params.length];
 		String isFirstTime = "yes";
 		String choice = "yes";
-		//businessController.startSubscriber();
 		while (choice.equalsIgnoreCase("yes")) {
 			if(!isFirstTime.equalsIgnoreCase("yes")){
 				System.out.println("Do you want to change your preferences (yes/no):");
@@ -33,9 +33,9 @@ public class UserInterface {
 				}
 				isFirstTime = "no";
 			}
-			System.out.println("Wait for the result ... \n");
+			System.out.println("\nWait for the result ... \n");
 			printResult(businessController.getRecommendation(weights));
-			System.out.println("Do you want to check again? (yes/no): ");
+			System.out.println("\nDo you want to check again? (yes/no): ");
 			choice = scanner.next();
 		}
 		scanner.close();
@@ -66,11 +66,15 @@ public class UserInterface {
 
 	private void printResult (List<DateFlightWeather> weatherAndFlights){
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
-		for (DateFlightWeather dailyData: weatherAndFlights) {
-			String date = dailyData.getWeather().getPredictionTime().atZone(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.BASIC_ISO_DATE);
-			System.out.println("The recommended destination is : " + dailyData.getWeather().getLocation().getName().toUpperCase());
-			System.out.println();
-			System.out.println("---------------------------------------------------------------------------------------");
+		for (int index = 0; index < weatherAndFlights.size(); index++) {
+			DateFlightWeather dailyData = weatherAndFlights.get(index);
+			String date = dailyData.getWeather().getPredictionTime().atZone(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			if (index == 0) {
+				System.out.println("The recommended destination is : " + dailyData.getWeather().getLocation().getName().toUpperCase());
+				System.out.println();
+				System.out.println("Following you have the weather conditions by day and available flights if there are any.");
+				System.out.println("---------------------------------------------------------------------------------------");
+			}
 			System.out.println("==================================");
 			System.out.println("DATE : " + date);
 			System.out.println("==================================");
@@ -79,16 +83,16 @@ public class UserInterface {
 			System.out.print(": " + dailyData.getWeather().getTemperature() + "°C");
 			System.out.println();
 			System.out.printf("%-20s", "Humidity");
-			System.out.print(": " + dailyData.getWeather().getHumidity() + "%");
+			System.out.print(": " + dailyData.getWeather().getHumidity() + " %");
 			System.out.println();
 			System.out.printf("%-20s", "Clouds");
-			System.out.print(": " + dailyData.getWeather().getClouds() + "%");
+			System.out.print(": " + dailyData.getWeather().getClouds() + " %");
 			System.out.println();
 			System.out.printf("%-20s", "Wind Speed");
-			System.out.print(": " + dailyData.getWeather().getWindSpeed() + "km/h");
+			System.out.print(": " + dailyData.getWeather().getWindSpeed() + " meter/sec");
 			System.out.println();
 			System.out.printf("%-20s", "Precipitation Probability");
-			System.out.print(": " + (dailyData.getWeather().getPrecipitationProbability()*100) + "%");
+			System.out.print(": " + (dailyData.getWeather().getPrecipitationProbability()*100) + " %");
 			System.out.println();
 			if (!dailyData.getFlights().isEmpty()) {
 				System.out.println("-----------------------------------------");
@@ -97,12 +101,12 @@ public class UserInterface {
 				Map<String, Flight> flights = dailyData.getFlights();
 				flights.forEach((key,flight) -> {
 					System.out.println();
-					System.out.println();
 					System.out.println("FROM :" + flight.getDepartureAirport() + " AT " + formatter.format(flight.getDepartureDatetime()));
-					System.out.println("TO :" + flight.getArrivalAirport() + " AT " + flight.getArrivalDatetime());
+					System.out.println("TO :" + flight.getArrivalAirport() + " AT " + formatter.format(flight.getArrivalDatetime()));
 					System.out.println("Operated by :" + flight.getCarrierName());
 					System.out.println("Duration :" + flight.getDuration());
 					System.out.println("Price :" + flight.getPrice() + flight.getCurrency());
+					System.out.println();
 				});
 			}
 		}

@@ -12,6 +12,9 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BusinessController {
 	private final DataSource dataSource;
@@ -41,8 +44,14 @@ public class BusinessController {
 
 	public void startSubscriber() throws BussinessUnitException {
 		dataSource.getData(dataManagement);
+		cleanData();
 	}
 
+	private void cleanData() {
+		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+		Runnable task = () -> dataManagement.deleteData(BusinessController.this.getNextWeekDates());
+		executor.scheduleAtFixedRate(task, 0, 24, TimeUnit.HOURS);
+	}
 	private Double[] calculateScores(Map<String, DateFlightWeather> dataGrid, List<String> dates, double[] weights){
 		Double[] scores = new Double[destinations.size()];
 		Arrays.fill(scores, 0.0);
@@ -71,7 +80,6 @@ public class BusinessController {
 		return information;
 	}
 
-
 	private List<String> getDestinations() throws BussinessUnitException {
 		List<String> destinations = new ArrayList<>();
 		String line;
@@ -97,8 +105,8 @@ public class BusinessController {
 		for (int i = 0; i < 5; i++) {
 			LocalDate nextDate = currentDate.plusDays(i+1);
 			Instant timestamp = nextDate.atStartOfDay().plusHours(12).toInstant(ZoneOffset.UTC);
-			String yyyymmdd = timestamp.atZone(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.BASIC_ISO_DATE);
-			timestamps.add(yyyymmdd);
+			String finalDate = timestamp.atZone(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.BASIC_ISO_DATE);
+			timestamps.add(finalDate);
 		}
 		return timestamps;
 	}

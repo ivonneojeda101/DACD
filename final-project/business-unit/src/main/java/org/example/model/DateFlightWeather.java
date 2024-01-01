@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class DateFlightWeather {
 	private Weather weather;
-	private Map<String, Flight> flights;
+	private final Map<String, Flight> flights;
 
 	public DateFlightWeather(Weather weather, Map<String, Flight> flights) {
 		this.weather = weather;

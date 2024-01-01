@@ -61,12 +61,6 @@ public class AmadeusFlightOffersProvider implements FlightProvider {
 					flights.add(flight);
 				}
 			}
-			else {
-				System.out.println("Flights provider not available");
-			}
-		}
-		else {
-			System.out.println("Flights provider not available");
 		}
 		return flights;
 	}

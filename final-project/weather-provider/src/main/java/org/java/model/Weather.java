@@ -3,15 +3,16 @@ package org.java.model;
 import java.time.Instant;
 
 public class Weather {
+
+	private final Instant ts = Instant.now();
+	private final String ss;
+	private final Instant predictionTime;
+	private final Location location;
 	private final double temperature;
 	private final int humidity;
 	private final int clouds;
 	private final double windSpeed;
 	private final int precipitationProbability;
-	private final Instant predictionTime;
-	private final Location location;
-	private final String ss;
-	private final Instant ts = Instant.now();
 
 	public Weather(double temperature, int humidity, int clouds, double windSpeed, int precipitationProbability, Location location, Instant predictionTime, String sourceStamp) {
 		this.temperature = temperature;

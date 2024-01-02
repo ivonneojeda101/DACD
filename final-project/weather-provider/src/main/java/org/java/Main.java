@@ -12,7 +12,7 @@ public class Main {
 			weathercontroller.fetchWeather();
 		}
 		catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.getMessage());
 		}
 	}
 }

@@ -39,7 +39,11 @@ public class BusinessController {
 				indexMaxScore = i;
 			}
 		}
-		return getWeatherAndFlights(dataGrid, destinations.get(indexMaxScore), dates);
+		if (scores[indexMaxScore] == 0){
+			return new ArrayList<>();
+		} else {
+			return getWeatherAndFlights(dataGrid, destinations.get(indexMaxScore), dates);
+		}
 	}
 
 	public void startSubscriber() throws BussinessUnitException {

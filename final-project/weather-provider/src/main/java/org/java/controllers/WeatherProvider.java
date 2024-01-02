@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface WeatherProvider {
-	public List<Weather> getWeather(Location location, Set<Instant> dateTimes);
+	List<Weather> getWeather(Location location, Set<Instant> dateTimes);
 }

@@ -17,7 +17,7 @@ public class MemoryDataManagement implements DataManagement {
 
 	private final Gson gson = prepareGson();
 	private final Map<String, DateFlightWeather> dataGrid;
-	Map<String, DataHandler> handlers;
+	final Map<String, DataHandler> handlers;
 	private final Object lock = new Object();
 
 	public MemoryDataManagement() {

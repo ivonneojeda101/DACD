@@ -3,7 +3,6 @@ package org.example.controllers.schemes;
 import java.time.Instant;
 
 public class Flight {
-
 	private final String destination;
 	private final String departureAirport;
 	private final Instant departureDatetime;
@@ -13,10 +12,9 @@ public class Flight {
 	private final String duration;
 	private final Double price;
 	private final String currency;
-	private final Instant predictionTime;
 	private final String key;
 
-	public Flight(String destination, String departureAirport, Instant departureDatetime, String arrivalAirport, Instant arrivalDatetime, String carrierName, String duration, Double price, String currency, Instant predictionTime) {
+	public Flight(String destination, String departureAirport, Instant departureDatetime, String arrivalAirport, Instant arrivalDatetime, String carrierName, String duration, Double price, String currency) {
 		this.destination = destination;
 		this.departureAirport = departureAirport;
 		this.departureDatetime = departureDatetime;
@@ -26,7 +24,6 @@ public class Flight {
 		this.duration = duration;
 		this.price = price;
 		this.currency = currency;
-		this.predictionTime = predictionTime;
 		this.key = (departureAirport + departureDatetime.toString() + arrivalAirport + arrivalDatetime.toString() + carrierName).replaceAll(" ","");
 	}
 
@@ -66,9 +63,6 @@ public class Flight {
 		return currency;
 	}
 
-	public Instant getPredictionTime() {
-		return predictionTime;
-	}
 	public String getKey() {
 		return key;
 	}

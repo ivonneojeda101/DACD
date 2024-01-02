@@ -9,7 +9,6 @@ import org.java.model.Weather;
 import org.java.utils.ApiRestClient;
 import java.time.*;
 import java.time.format.*;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

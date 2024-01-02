@@ -12,7 +12,7 @@ public class Main {
 			flightcontroller.fetchFlight(args[8]);
 		}
 		catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.getMessage());
 		}
 	}
 }

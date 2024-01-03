@@ -32,14 +32,10 @@ public class OpenWeatherMapProvider implements WeatherProvider {
 			for (JsonElement element : listTimeForecast) {
 				JsonObject hourForecast = element.getAsJsonObject();
 				Instant timestampJSON = Instant.ofEpochSecond(hourForecast.get("dt").getAsLong());
-				if (dateTimes.contains(timestampJSON)){
-					forecast.add(createWeather(hourForecast, location));
-				}
+				if (dateTimes.contains(timestampJSON)) forecast.add(createWeather(hourForecast, location));
 			}
 		}
-		else {
-			System.out.println("Weather service is not available");
-		}
+		else System.out.println("Weather service is not available");
 		return forecast;
 	}
 

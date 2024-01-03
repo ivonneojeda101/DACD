@@ -26,6 +26,22 @@ public class WeatherController {
 		this.hourFrequency = hourFrequency;
 		locations = getLocations();
 	}
+
+	private List<Location> getLocations() throws WeatherException {
+		List<Location> locationList = new ArrayList<>();
+		String line;
+		try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+			while ((line = br.readLine()) != null) {
+				String[] data = line.split(";");
+				if (data.length == 4)
+					locationList.add(new Location(data[0], Double.parseDouble(data[1]), Double.parseDouble(data[2])));
+				else throw new WeatherException("Skipping invalid data: " + line);
+			}
+		} catch (Exception e) {
+			throw new WeatherException(e.getMessage());
+		}
+		return locationList;
+	}
 	public void fetchWeather() throws WeatherException {
 		try {
 			Timer timer = new Timer();
@@ -35,43 +51,20 @@ public class WeatherController {
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
-					dateTimes = generateDateTimes();
-					for (Location location : locations) {
-						List<Weather> weatherList = weatherProvider.getWeather(location, dateTimes);
-						for (Weather weather : weatherList) {
-							try {
-								weatherStore.setWeather(weather);
-							} catch (WeatherException e) {
-								throw new RuntimeException(e);
-							}
+					try {
+						dateTimes = generateDateTimes();
+						for (Location location : locations) {
+							List<Weather> weatherList = weatherProvider.getWeather(location, dateTimes);
+							for (Weather weather : weatherList) weatherStore.setWeather(weather);
 						}
+					} catch (WeatherException e) {
+						throw new RuntimeException(e);
 					}
 				}
 			}, 0, milliseconds);
 		} catch (Exception e) {
 			throw new WeatherException(e.getMessage());
 		}
-	}
-	private List<Location> getLocations() throws WeatherException {
-		List<Location> locationList = new ArrayList<>();
-		String line;
-		String csvDelimiter = ";";
-		try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
-			while ((line = br.readLine()) != null) {
-				String[] data = line.split(csvDelimiter);
-				if (data.length == 4) {
-					String name = data[0];
-					double latitude = Double.parseDouble(data[1]);
-					double longitude = Double.parseDouble(data[2]);
-					locationList.add(new Location(name, latitude, longitude));
-				} else {
-					throw new WeatherException("Skipping invalid data: " + line);
-				}
-			}
-		} catch (Exception e) {
-			throw new WeatherException(e.getMessage());
-		}
-		return locationList;
 	}
 
 	private Set<Instant> generateDateTimes() {

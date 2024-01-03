@@ -11,7 +11,7 @@
         <module>datalake-builder</module>
         <module>weather-provider</module>
         <module>flight-provider</module>
-        <module>business-unit</module>
+        <module>destination-advisor</module>
     </modules>
 
     <properties>

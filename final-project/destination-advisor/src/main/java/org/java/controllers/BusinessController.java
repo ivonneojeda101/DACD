@@ -3,7 +3,6 @@ package org.java.controllers;
 import org.java.controllers.schemes.Weather;
 import org.java.exceptions.BussinessUnitException;
 import org.java.model.DateFlightWeather;
-import org.java.exceptions.WeatherException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -35,7 +34,7 @@ public class BusinessController {
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(";");
 				if (data.length == 4) destinations.add(data[0]);
-				else throw new WeatherException("Skipping invalid data: " + line);
+				else throw new BussinessUnitException("Skipping invalid data: " + line);
 			}
 		} catch (Exception e) {
 			throw new BussinessUnitException(e.getMessage());

@@ -38,6 +38,7 @@ public class AMQWeatherStore implements WeatherStore {
 			throw new WeatherException(e.getMessage());
 		}
 	}
+
 	@Override
 	public void setWeather(Weather weather) throws WeatherException {
 		try {

@@ -55,7 +55,7 @@ public class UserInterface {
 		return weight/100;
 	}
 
-	private void printResult (List<DateFlightWeather> weatherAndFlights){
+	private void printResult(List<DateFlightWeather> weatherAndFlights){
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
 		if (!weatherAndFlights.isEmpty()) {
 			for (int index = 0; index < weatherAndFlights.size(); index++) {

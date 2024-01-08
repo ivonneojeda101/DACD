@@ -67,7 +67,6 @@ public class FlightController {
 			throw new CustomException(e.getMessage());
 		}
 	}
-
 	private Set<Instant> generateDateTimes() {
 		Set<Instant> timestamps = new HashSet<>();
 		LocalDate currentDate = LocalDate.now();

@@ -64,7 +64,7 @@ java -jar weather-provider.jar apiKey apiURL csvFilePath busUrl topic hoursFrequ
       - Latitude
       - Code of the nearest airport
      
-Note: There is an example in the repository folder examples.
+    Note: There is an example in the repository folder examples.
 4. `busUrl`: URL of the broker.
 5. `topic`: Name of the topic used to deliver weather information messages.
 6. `hoursFrequency`: The frequency of the query (in hours, an integer with one decimal).
@@ -119,11 +119,11 @@ java -jar destination-advisor.jar busUrl topics datalakePath csvFilePath
 
 ## Design
 
-### Architecture
+### ArchitectureS
 
 The application is built under the kappa architecture concept since it needs to process immediate data insights to provide accurate information to the user and at the same time to store it in a data-lake then a continuous data stream is required. Because the kappa architecture's emphasis is stream processing without separate batch layers, this streamlined approach aligns with the continuous flow of data and the real-time processing needed by the modules of destination-advisor and datalake-builder in specific.
 
-However, MVC Architecture is used in each module to cleanly separate concerns: the Model manages data logic, the View handles user interface, and the Controller orchestrates interactions, enhancing code organization and maintainability by keeping distinct functionalities apart, thinking in future improvements it allows a certain level of scalability through modular development.
+However, the software architecture MVC is used in each module to cleanly separate concerns: the Model manages data logic, the View handles user interface, and the Controller orchestrates interactions, enhancing code organization and maintainability by keeping distinct functionalities apart, thinking in future improvements it allows a certain level of scalability through modular development.
 
 ### Design Patterns and Principles
 
@@ -137,7 +137,7 @@ On the other hand, the pattern promotes a decoupled, efficient system where each
 
 #### SOLID Principles
 
-The SOLID principles are a set of object-oriented design principles that aim to create scalable and maintainable software. Here's a brief overview:
+The SOLID principles are a set of object-oriented design principles applied to create scalable and maintainable software. Here's a brief overview:
 
 - Each class should have a single responsibility.
 - Software entities should be open for extension but closed for modification.
@@ -147,4 +147,16 @@ The SOLID principles are a set of object-oriented design principles that aim to 
 
 ### UML Class Diagram
 
-![UML Class Diagram](./src/files/UML_Ejercicio_1.jpg)
+The following diagrams displayed the relationship between classes for each module:
+
+1. **Weather Provider:**
+   ![UML Class Diagram](./img/weather-provider.jpg)
+2. **Flight Provider:**
+   ![UML Class Diagram](./img/flight-provider.jpg)
+3. **Datalake-Builder:**
+   ![UML Class Diagram](./img/datalake-builder.jpg)
+4. **Destination Advisor:** 
+   ![UML Class Diagram](./img/destination-advisor.jpg)
+
+
+
